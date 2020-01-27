@@ -7,5 +7,7 @@ These are samples of how to use Python to run Automation Test with Selenium and 
 
 # Resources
 <https://kobiton.com/>
+
 <https://api.kobiton.com/docs/>
+
 <https://github.com/kobiton/samples/tree/master/python>
