@@ -13,6 +13,7 @@ import requests
 import base64
 import json
 
+
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
@@ -24,14 +25,16 @@ session_timeout = 120
 def SetUpKobiton(self):
     FavoriteDevices = GetFavoriteDevices()
     for FavoriteDevice in FavoriteDevices['favoriteDevices']:
-        if FavoriteDevice['isBooked'] == False:
+        if FavoriteDevice['isBooked'] == False and FavoriteDevice['isOnline'] == True:
             browserName = FavoriteDevice['installedBrowsers'][0]['name']
             deviceName = FavoriteDevice['deviceName']
             platformName = FavoriteDevice['platformName']
             platformVersion = FavoriteDevice['platformVersion']
+            print(deviceName)
             break
         else:
             continue
+    
     desired_caps = {
         # The generated session will be visible to you only.
         'sessionName':        'Automation test session',
@@ -57,8 +60,6 @@ def SetUpKobiton(self):
         self.driver.implicitly_wait(session_timeout)
         kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
         print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
-        print(GetDevice())
-        getTestResult(kobitonSessionId)
 
 def GetFavoriteDevices():
     api_key = (USERNAME + ':' + API_KEYS)
@@ -79,7 +80,19 @@ def QuitKobiton(self):
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
     getTestResult(kobitonSessionId)
 
+
+path = os.getcwd()
+files = os.listdir(path)
+test_files = [file for file in files if 'test_' in file]
+files_count = len(test_files)
+
+count = 0
+result_lists = [[] for i in range(files_count)]
+email_text = "<table border='1'><tr><th>Test File</th><th>Device Name</th><th>Session URL</th></tr>"
 def getTestResult(kobitonSessionId):
+    global count
+    global email_text
+    global files
     api_key = (USERNAME+ ':' + API_KEYS)
     auth = base64.b64encode(api_key.encode())
     print(auth)
@@ -90,8 +103,29 @@ def getTestResult(kobitonSessionId):
     response = requests.get('https://api.kobiton.com/v1/sessions/' + str(kobitonSessionId), params={
     }, headers = headers)
     data = response.json()
-    EmailService().send_result_mail(data,kobitonSessionId)
+    result_lists[count].append(test_files[count])
+    result_lists[count].append(data['executionData']['desired']['deviceName'])
+    result_lists[count].append("https://portal.kobiton.com/sessions/"+ str(kobitonSessionId))
+    print(result_lists)
+    count += 1
+    print(count)
+    if count == files_count:
+        for result_list in result_lists:
+            print(result_list[0])
+            email_text += "<tr><td>" + result_list[0] + "</td>"
+            email_text += "<td>" + result_list[1] + "</td>"
+            email_text += "<td>" + result_list[2] + "</td></tr>"
+        
+        email_text += "</table>"
+        EmailService().send_result_mail(email_text,kobitonSessionId)     
+    else:
+        print("Contunue Test")
+        
+
     
 
+        
 
+    
+    
 
