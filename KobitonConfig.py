@@ -22,8 +22,22 @@ API_KEYS = os.environ.get("API_KEYS")
 KOBITON_SERVER_URL = "https://" + USERNAME + ":" + API_KEYS + "@api.kobiton.com/wd/hub"
 session_timeout = 120
 
+###############FetchFavoriteDevices##############################
+def FetchFavoriteDevices():
+    api_key = (USERNAME + ':' + API_KEYS)
+    auth = base64.b64encode(api_key.encode())
+    headers = {
+    'Authorization': 'Basic ' + auth.decode(),
+    'Accept': 'application/json'
+    }
+    response = requests.get('https://api.kobiton.com/v1/devices', params={
+
+    }, headers = headers)
+    data = response.json()
+    return data
+
 def SetUpKobiton(self):
-    FavoriteDevices = GetFavoriteDevices()
+    FavoriteDevices = FetchFavoriteDevices()
     for FavoriteDevice in FavoriteDevices['favoriteDevices']:
         if FavoriteDevice['isBooked'] == False and FavoriteDevice['isOnline'] == True:
             browserName = FavoriteDevice['installedBrowsers'][0]['name']
@@ -50,45 +64,31 @@ def SetUpKobiton(self):
         'platformName':       platformName,
         'platformVersion':    platformVersion
     }
-    if desired_caps["platformName"] == "Android":
-        self.driver = webdriver.Remote(KOBITON_SERVER_URL,desired_caps)
-        self.driver.implicitly_wait(session_timeout)
-        kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
-        print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
-    elif desired_caps["platformName"] == "iOS":
-        self.driver = webdriver.Remote(KOBITON_SERVER_URL, desired_caps)
-        self.driver.implicitly_wait(session_timeout)
-        kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
-        print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
 
-def GetFavoriteDevices():
-    api_key = (USERNAME + ':' + API_KEYS)
-    auth = base64.b64encode(api_key.encode())
-    headers = {
-    'Authorization': 'Basic ' + auth.decode(),
-    'Accept': 'application/json'
-    }
-    response = requests.get('https://api.kobiton.com/v1/devices', params={
+    self.driver = webdriver.Remote(KOBITON_SERVER_URL,desired_caps)
+    self.driver.implicitly_wait(session_timeout)
+    kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
+    print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
+   
 
-    }, headers = headers)
-    data = response.json()
-    return data
-
-    
+###############Finish Test on Kobiton#################################
 def QuitKobiton(self):
     self.driver.quit()
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
     getTestResult(kobitonSessionId)
 
 
+###########################################################################
+###############Get Test Result and Send mail###############################
+###########################################################################
+
 path = os.getcwd()
 files = os.listdir(path)
 test_files = [file for file in files if 'test_' in file]
 files_count = len(test_files)
-
 count = 0
 result_lists = [[] for i in range(files_count)]
-email_text = "<table border='1'><tr><th>Test File</th><th>Device Name</th><th>Session URL</th></tr>"
+email_text = "<table border='1'><tr><th>Test File</th><th>Status</th><th>Device Name</th><th>Video</th><th>Session URL</th></tr>"
 def getTestResult(kobitonSessionId):
     global count
     global email_text
@@ -104,7 +104,14 @@ def getTestResult(kobitonSessionId):
     }, headers = headers)
     data = response.json()
     result_lists[count].append(test_files[count])
+    result_lists[count].append(data['state'])
     result_lists[count].append(data['executionData']['desired']['deviceName'])
+    if not data['video']:
+        result_lists[count].append("Video is being uploaded and will be available shortly.")
+    elif data['state'] == "ERROR":
+        print("No video found due to error")
+    else:
+        result_lists[count].append(data['executionData']['video']['path'])
     result_lists[count].append("https://portal.kobiton.com/sessions/"+ str(kobitonSessionId))
     print(result_lists)
     count += 1
@@ -114,7 +121,9 @@ def getTestResult(kobitonSessionId):
             print(result_list[0])
             email_text += "<tr><td>" + result_list[0] + "</td>"
             email_text += "<td>" + result_list[1] + "</td>"
-            email_text += "<td>" + result_list[2] + "</td></tr>"
+            email_text += "<td>" + result_list[2] + "</td>"
+            email_text += "<td>" + result_list[3] + "</td>"
+            email_text += "<td>" + result_list[4] + "</td></tr>"
         
         email_text += "</table>"
         EmailService().send_result_mail(email_text,kobitonSessionId)     
@@ -123,6 +132,10 @@ def getTestResult(kobitonSessionId):
         
 
     
+
+        
+
+   
 
         
 
