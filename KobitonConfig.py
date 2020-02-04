@@ -1,4 +1,5 @@
 import os
+import sys
 from selenium import webdriver
 from selenium.webdriver.remote.remote_connection import RemoteConnection
 from selenium.webdriver.common.keys import Keys
@@ -38,6 +39,8 @@ def FetchFavoriteDevices():
 
 def SetUpKobiton(self):
     FavoriteDevices = FetchFavoriteDevices()
+    if not FavoriteDevices:
+        print("error")
     for FavoriteDevice in FavoriteDevices['favoriteDevices']:
         if FavoriteDevice['isBooked'] == False and FavoriteDevice['isOnline'] == True:
             browserName = FavoriteDevice['installedBrowsers'][0]['name']
