@@ -142,21 +142,23 @@ def fetchTestResult(kobitonSessionIds):
             for result_list in result_lists:
                 print(result_list[0])
                 if len(result_list) == 4:
-                    email_text += "<tr bgcolor='green'><td>" + result_list[0] + "</td>"
+                    email_text += "<tr bgcolor='rgb(121, 187, 255)'><td>" + result_list[0] + "</td>"
                     email_text += "<td>" + result_list[1] + "</td>"
                     email_text += "<td>" + result_list[2] + "</td>"
                     email_text += "<td>" + result_list[3] + "</td>"
                     email_text += "<td>Passed</td></tr>"
                 else:
-                    email_text += "<tr bgcolor='red'><td>" + result_list[0] + "</td>"
+                    email_text += "<tr bgcolor='#F56C6C'><td>" + result_list[0] + "</td>"
                     email_text += "<td>" + result_list[1] + "</td>"
                     email_text += "<td>" + result_list[2] + "</td>"
                     email_text += "<td>" + result_list[3] + "</td>"
                     email_text += "<td>Failed</td></tr>"
-                    email_text += "<tr><td bgcolor='red' colspan='5'>" + str(result_list[4]) + "</td></tr>"    
+                    email_text += "<tr><td colspan='5'>Error Description</td></tr>"
+                    email_text += "<tr><td bgcolor='#F56C6C' colspan='5'>" + str(result_list[4]) + "</td></tr>"    
             
             email_text += "</table>"
-            EmailService().send_result_mail(email_text,kobitonSessionId)     
+            EmailService().send_result_mail(email_text,kobitonSessionId)    
+            sys.exit() 
         else:
             print("Contunue Test")
         
