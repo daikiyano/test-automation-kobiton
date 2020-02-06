@@ -30,9 +30,16 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 ```
 
 
+
 - set up
 
 ```
+from selenium import webdriver
+import KobitonConfig
+import unittest
+import xmlrunner
+
+
 def setUp(self):
         KobitonConfig.SetUpKobiton(self)
     
