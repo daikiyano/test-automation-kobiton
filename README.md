@@ -41,6 +41,7 @@ def tearDown(self):
         
 ```
 
+<img width="315" alt="Screen Shot 2020-02-05 at 22 06 36" src="https://user-images.githubusercontent.com/36895565/73923725-01483f00-48d4-11ea-8974-528d9e8731c1.png">
 
 # Resources
 <https://kobiton.com/>
