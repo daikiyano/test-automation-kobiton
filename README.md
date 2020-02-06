@@ -5,7 +5,14 @@ test-automation-kobiton
 # Description
 These are samples of how to use Python to run Automation Test with Selenium and on KOBITON.
 
-### 1. SetUp(General)
+# Kobiton
+
+- Set desired devices as favorite devices on Kobiton.
+
+<img width="1235" alt="Screen Shot 2020-02-06 at 18 15 34" src="https://user-images.githubusercontent.com/36895565/73956066-0f668180-490d-11ea-884f-8c60d6913765.png">
+
+
+### 1. SetUp
 - Kobiton Credentials
 - Access <https://portal.kobiton.com/> with your account
 - Get your username & API Key
@@ -28,16 +35,6 @@ AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 ```
-
-
-<<<<<<< HEAD
-
-- set up
-=======
-# set up
-
-File name should be test*.py
->>>>>>> 5236fd286d34c6673fd37ee0eed9a95d1444d3a9
 
 ```
 from selenium import webdriver
