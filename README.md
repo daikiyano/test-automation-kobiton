@@ -66,9 +66,8 @@ python [file name]
 ```
 # Result list as Email
 
-<img width="315" alt="Screen Shot 2020-02-05 at 22 06 36" src="https://user-images.githubusercontent.com/36895565/73923725-01483f00-48d4-11ea-8974-528d9e8731c1.png">
-<img width="1084" alt="Screen Shot 2020-02-06 at 11 17 19" src="https://user-images.githubusercontent.com/36895565/73944917-19cc4f80-48fc-11ea-9f0b-e248fe13a14d.png">
 
+<img width="1084" alt="Screen Shot 2020-02-06 at 11 17 19" src="https://user-images.githubusercontent.com/36895565/73955363-e7c2e980-490b-11ea-83f7-c2925a75641b.png">
 
 # Resources
 <https://kobiton.com/>
