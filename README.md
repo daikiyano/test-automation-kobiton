@@ -6,10 +6,16 @@ test-automation-kobiton
 These are samples of how to use Python to run Automation Test with Selenium and on KOBITON.
 
 ### 1. SetUp(General)
+- install python library 
+
+```
+pip install -r requirements.txt
+```
+
 - Kobiton Credentials
 - Access <https://portal.kobiton.com/> with your account
 - Get your username & API Key
-- Set your username & API Key & KOBITON_SERVER_URL
+- Set your username & API Key & KOBITON_SERVER_URL on KobitonConfig.py
 
 ```
 KobitonConfig.py
@@ -18,6 +24,10 @@ API_KEYS = os.environ.get("API_KEYS")
 KOBITON_SERVER_URL = "https://" + USERNAME + ":" + API_KEYS + "@api.kobiton.com/wd/hub"
 
 ```
+
+- Get your ACCESS_KEY & AWS_SECRET_ACCESS_KEY on AWS
+- Set your ACCESS_KEY & AWS_SECRET_ACCESS_KEY & your Email on AmazonSesSample.py 
+
 
 ```
 AmazonSesSample.py 
@@ -29,15 +39,8 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 ```
 
-
-<<<<<<< HEAD
-
-- set up
-=======
-# set up
-
 File name should be test*.py
->>>>>>> 5236fd286d34c6673fd37ee0eed9a95d1444d3a9
+
 
 ```
 from selenium import webdriver
@@ -51,6 +54,9 @@ def setUp(self):
     
 def tearDown(self):
     KobitonConfig.QuitKobiton(self)
+    
+if __name__ == '__main__':
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='reports'),failfast=False, buffer=False, catchbreak=False)
         
 ```
 
@@ -65,6 +71,7 @@ python [file name]
 
 ```
 # Result list as Email
+
 
 <img width="315" alt="Screen Shot 2020-02-05 at 22 06 36" src="https://user-images.githubusercontent.com/36895565/73923725-01483f00-48d4-11ea-8974-528d9e8731c1.png">
 
