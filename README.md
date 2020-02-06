@@ -6,13 +6,12 @@ test-automation-kobiton
 These are samples of how to use Python to run Automation Test with Selenium and on KOBITON.
 
 # Kobiton
-
 - Set desired devices as favorite devices on Kobiton.
 
 <img width="1235" alt="Screen Shot 2020-02-06 at 18 15 34" src="https://user-images.githubusercontent.com/36895565/73956066-0f668180-490d-11ea-884f-8c60d6913765.png">
 
 
-### 1. SetUp
+# SetUp
 - Kobiton Credentials
 - Access <https://portal.kobiton.com/> with your account
 - Get your username & API Key
