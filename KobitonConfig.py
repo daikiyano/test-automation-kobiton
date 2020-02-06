@@ -6,16 +6,15 @@ from selenium.webdriver.common.keys import Keys
 from AmazonSesSample import EmailService
 from os.path import join, dirname
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 import time
 import unittest
 import random
 import requests
 import base64
 import json
-from time import sleep
 import atexit
-from bs4 import BeautifulSoup
-
+import shutil
 
 
 dotenv_path = join(dirname(__file__), '.env')
@@ -39,6 +38,10 @@ def FetchFavoriteDevices():
     return data
 
 def SetUpKobiton(self):
+    # Delete file in the report folder
+    target_dir = 'report'
+    shutil.rmtree(target_dir)
+    os.mkdir(target_dir)  
     FavoriteDevices = FetchFavoriteDevices()
     for FavoriteDevice in FavoriteDevices['favoriteDevices']:
         if FavoriteDevice['isBooked'] == False and FavoriteDevice['isOnline'] == True:
@@ -50,7 +53,10 @@ def SetUpKobiton(self):
             break
         else:
             continue
-    
+    try:
+        browserName
+    except:
+        print('Device is no available')
 
     desired_caps = {
         # The generated session will be visible to you only.
@@ -68,51 +74,48 @@ def SetUpKobiton(self):
         'platformName':       platformName,
         'platformVersion':    platformVersion
     }
-
     self.driver = webdriver.Remote(KOBITON_SERVER_URL,desired_caps)
     self.driver.implicitly_wait(session_timeout)
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
     print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
    
-
 session_list = []
 ###############Finish Test on Kobiton#################################
 def QuitKobiton(self):
     self.driver.quit()
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
     session_list.append(kobitonSessionId)
-    print(session_list)
+
+    # After finising program and generating Xml file as results, fetchTestResult() going to run.
     atexit.register(fetchTestResult, session_list)
     
+    
+
 
 ###########################################################################
 ###############Get Test Result and Send mail###############################
 ###########################################################################
 
 
-
 path = os.getcwd()
 files = os.listdir(path)
 
 # fond file witch match 'test_'
-test_files = [file for file in files if 'test_' in file]
+test_files = [file for file in files if 'test' in file]
 files_count = len(test_files)
 count = 0
 # make two-dimensional list
 result_lists = [[] for i in range(files_count)]
 
-
 email_text = "<table border='1'><tr><th>File name</th><th>Status</th><th>Device Name</th><th>Session URL</th><th>result</th></tr>"
 def fetchTestResult(kobitonSessionIds):
     for kobitonSessionId in kobitonSessionIds:
-        print("####################")
-        print(kobitonSessionId)
+        print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
         global count
         global email_text
         global files
         api_key = (USERNAME+ ':' + API_KEYS)
         auth = base64.b64encode(api_key.encode())
-        print(auth)
         headers = {
                 'Authorization': 'Basic ' + auth.decode(),
                 'Accept': 'application/json'
@@ -121,20 +124,17 @@ def fetchTestResult(kobitonSessionIds):
         }, headers = headers)
         data = response.json()
 
-        report_path = path + "/report"
-        report_paths = os.listdir(report_path)
+        xml_files = os.listdir(path + "/report")
         result_lists[count].append(test_files[count])
         result_lists[count].append(data['state'])
         result_lists[count].append(data['executionData']['desired']['deviceName'])
         result_lists[count].append("https://portal.kobiton.com/sessions/"+ str(kobitonSessionId))
-        for report_path in report_paths:
-            if  test_files[count][0:-3] in report_path:
-                print("######")
-                print(report_path)
-                with open("report/" + report_path) as f:
+        
+        for xml_file in xml_files:
+            if  test_files[count][0:-3] in xml_file:
+                with open("report/" + xml_file) as f:
                     soup = BeautifulSoup(f, 'xml')
                 for e in soup.find_all('error'):
-                    print(e)
                     result_lists[count].append(e)
         count += 1
         print(count)
@@ -142,7 +142,7 @@ def fetchTestResult(kobitonSessionIds):
             for result_list in result_lists:
                 print(result_list[0])
                 if len(result_list) == 4:
-                    email_text += "<tr bgcolor='rgb(121, 187, 255)'><td>" + result_list[0] + "</td>"
+                    email_text += "<tr bgcolor='79BBFF'><td>" + result_list[0] + "</td>"
                     email_text += "<td>" + result_list[1] + "</td>"
                     email_text += "<td>" + result_list[2] + "</td>"
                     email_text += "<td>" + result_list[3] + "</td>"
@@ -155,13 +155,17 @@ def fetchTestResult(kobitonSessionIds):
                     email_text += "<td>Failed</td></tr>"
                     email_text += "<tr><td colspan='5'>Error Description</td></tr>"
                     email_text += "<tr><td bgcolor='#F56C6C' colspan='5'>" + str(result_list[4]) + "</td></tr>"    
-            
             email_text += "</table>"
-            EmailService().send_result_mail(email_text,kobitonSessionId)    
-            sys.exit() 
+            EmailService().send_result_mail(email_text,kobitonSessionId)  
         else:
-            print("Contunue Test")
+            print("Test is still in progress...")
         
+
+    
+
+        
+
+   
 
     
 
