@@ -5,6 +5,7 @@ test-automation-kobiton
 # Description
 These are samples of how to use Python to run Automation Test with Selenium and on KOBITON.
 
+<<<<<<< HEAD
 ### 1. SetUp(General)
 - install python library 
 
@@ -12,6 +13,15 @@ These are samples of how to use Python to run Automation Test with Selenium and 
 pip install -r requirements.txt
 ```
 
+=======
+# Kobiton
+- Set desired devices as favorite devices on Kobiton.
+
+<img width="1235" alt="Screen Shot 2020-02-06 at 18 15 34" src="https://user-images.githubusercontent.com/36895565/73956066-0f668180-490d-11ea-884f-8c60d6913765.png">
+
+
+# SetUp
+>>>>>>> 9b7860bc35ed4f048f5e7b27296ac571a9900bd9
 - Kobiton Credentials
 - Access <https://portal.kobiton.com/> with your account
 - Get your username & API Key
@@ -39,9 +49,12 @@ AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
 
 ```
 
+<<<<<<< HEAD
 File name should be test*.py
 
 
+=======
+>>>>>>> 9b7860bc35ed4f048f5e7b27296ac571a9900bd9
 ```
 from selenium import webdriver
 import KobitonConfig
@@ -73,7 +86,11 @@ python [file name]
 # Result list as Email
 
 
+<<<<<<< HEAD
 <img width="315" alt="Screen Shot 2020-02-05 at 22 06 36" src="https://user-images.githubusercontent.com/36895565/73923725-01483f00-48d4-11ea-8974-528d9e8731c1.png">
+=======
+<img width="1084" alt="Screen Shot 2020-02-06 at 11 17 19" src="https://user-images.githubusercontent.com/36895565/73955363-e7c2e980-490b-11ea-83f7-c2925a75641b.png">
+>>>>>>> 9b7860bc35ed4f048f5e7b27296ac571a9900bd9
 
 # Resources
 <https://kobiton.com/>
