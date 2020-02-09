@@ -109,6 +109,7 @@ result_lists = [[] for i in range(files_count)]
 
 email_text = "<table border='1'><tr><th>File name</th><th>Status</th><th>Device Name</th><th>Session URL</th><th>result</th></tr>"
 def fetchTestResult(kobitonSessionIds):
+    session_count = len(kobitonSessionIds)
     for kobitonSessionId in kobitonSessionIds:
         print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
         global count
@@ -138,7 +139,7 @@ def fetchTestResult(kobitonSessionIds):
                     result_lists[count].append(e)
         count += 1
         print(count)
-        if count == files_count:
+        if count == session_count:
             for result_list in result_lists:
                 print(result_list[0])
                 if len(result_list) == 4:
@@ -160,12 +161,6 @@ def fetchTestResult(kobitonSessionIds):
         else:
             print("Test is still in progress...")
         
-
-    
-
-        
-
-   
 
     
 

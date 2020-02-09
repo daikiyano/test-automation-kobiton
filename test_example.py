@@ -1,11 +1,11 @@
 from selenium import webdriver
-from selenium.webdriver.remote.remote_connection import RemoteConnection
-from selenium.webdriver.common.keys import Keys
 import time
 import unittest
 import HTMLTestRunner
 import random
 import KobitonConfig
+import xmlrunner
+
 import requests
 
 
@@ -46,6 +46,6 @@ class test_user_account(unittest.TestCase):
    
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(testRunner=xmlrunner.XMLTestRunner(output='reports'),failfast=False, buffer=False, catchbreak=False)
    
 
