@@ -22,7 +22,7 @@ load_dotenv(dotenv_path)
 USERNAME = os.environ.get("USERNAME")
 API_KEYS = os.environ.get("API_KEYS")
 KOBITON_SERVER_URL = "https://" + USERNAME + ":" + API_KEYS + "@api.kobiton.com/wd/hub"
-session_timeout = 120
+session_timeout = 60
 
 ###############FetchFavoriteDevices##############################
 def FetchFavoriteDevices():
@@ -80,7 +80,8 @@ def SetUpKobiton(self):
     print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
    
 session_list = []
-###############Finish Test on Kobiton#################################
+
+# ###############Finish Test on Kobiton#################################
 def QuitKobiton(self):
     self.driver.quit()
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
@@ -102,6 +103,7 @@ files = os.listdir(path)
 
 # fond file witch match 'test_'
 test_files = [file for file in files if 'test' in file]
+test_files.sort()
 files_count = len(test_files)
 count = 0
 # make two-dimensional list
