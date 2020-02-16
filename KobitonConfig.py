@@ -22,7 +22,7 @@ load_dotenv(dotenv_path)
 USERNAME = os.environ.get("USERNAME")
 API_KEYS = os.environ.get("API_KEYS")
 KOBITON_SERVER_URL = "https://" + USERNAME + ":" + API_KEYS + "@api.kobiton.com/wd/hub"
-session_timeout = 60
+session_timeout = 40
 
 ###############FetchFavoriteDevices##############################
 def FetchFavoriteDevices():
@@ -37,7 +37,7 @@ def FetchFavoriteDevices():
     data = response.json()
     return data
 
-def SetUpKobiton(self):
+def SetUpKobiton(self,file_name):
     # Delete file in the report folder
     target_dir = 'report'
     shutil.rmtree(target_dir)
@@ -60,7 +60,7 @@ def SetUpKobiton(self):
 
     desired_caps = {
         # The generated session will be visible to you only.
-        'sessionName':        'Automation test session',
+        'sessionName':        file_name,
         'sessionDescription': '',
         'deviceOrientation':  'portrait',
         'captureScreenshots': True,
@@ -162,7 +162,9 @@ def fetchTestResult(kobitonSessionIds):
             EmailService().send_result_mail(email_text,kobitonSessionId)  
         else:
             print("Test is still in progress...")
-        
+
+
+
 
     
 
