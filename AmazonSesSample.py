@@ -1,99 +1,96 @@
+
+import smtplib  
+import email.utils
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import os
 from os.path import join, dirname
 from dotenv import load_dotenv
-import boto3
-from botocore.exceptions import ClientError
 
 dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
+
 class EmailService():
-    # Replace sender@example.com with your "From" address.
-    # This address must be verified with Amazon SES.
-    SENDER = "EMAIL"
+# Replace sender@example.com with your "From" address. 
+# This address must be verified.
+    def send_result_mail(seif,data,kobitonSessionId):
+            SENDER = 'daikitech0123@gmail.com'  
+            SENDERNAME = 'Sender Name'
 
-    # Replace recipient@example.com with a "To" address. If your account 
-    # is still in the sandbox, this address must be verified.
-    RECIPIENT = "EMAIL"
+            # Replace recipient@example.com with a "To" address. If your account 
+            # is still in the sandbox, this address must be verified.
+            RECIPIENT  = 'daikitech0123@gmail.com'
 
-    # Specify a configuration set. If you do not want to use a configuration
-    # set, comment the following variable, and the 
-    # ConfigurationSetName=CONFIGURATION_SET argument below.
-    CONFIGURATION_SET = "ConfigSet"
-    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-    # If necessary, replace us-west-2 with the AWS Region you're using for Amazon SES.
-    AWS_REGION = "ap-south-1"
+            # Replace smtp_username with your Amazon SES SMTP user name.
+            USERNAME_SMTP = os.environ.get("USERNAME_SMTP")
 
-    # The subject line for the email.
-    SUBJECT = "【KOBITON】Result of Automation Test"
+            # Replace smtp_password with your Amazon SES SMTP password.
+            PASSWORD_SMTP = os.environ.get("PASSWORD_SMTP")
 
-    # The email body for recipients with non-HTML email clients.
-    BODY_TEXT = ("Amazon SES Test (Python)\r\n"
-                "This email was sent with Amazon SES using the "
-                "AWS SDK for Python (Boto)."
-                )
-                
-    # The HTML body of the email.
-    BODY_HTML = """<html>
-    <head></head>
-    <body>
-    <h1>Amazon SES Test (SDK for Python)</h1>
-    <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a> using the
-        <a href='https://aws.amazon.com/sdk-for-python/'>
-        AWS SDK for Python (Boto)</a>.</p>
-    </body>
-    </html>
-                """            
+            # (Optional) the name of a configuration set to use for this message.
+            # If you comment out this line, you also need to remove or comment out
+            # the "X-SES-CONFIGURATION-SET:" header below.
+            # CONFIGURATION_SET = "ConfigSet"
 
-    # The character encoding for the email.
-    CHARSET = "UTF-8"
+            # If you're using Amazon SES in an AWS Region other than US West (Oregon), 
+            # replace email-smtp.us-west-2.amazonaws.com with the Amazon SES SMTP  
+            # endpoint in the appropriate region.
+            HOST = os.environ.get("HOST")
+            PORT = os.environ.get("PORT")
 
-    # Create a new SES resource and specify a region.
-    def __init__(self):
-        self.client = boto3.client('ses',
-                            aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                            aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY,
-                            region_name=self.AWS_REGION)
+            # The subject line of the email.
+            SUBJECT = '【KOBITON】the results of Automation Test with Python'
 
-    def send_result_mail(self,data,kobitonSessionId):
-        # Try to send the email.
-        try:
-            #Provide the contents of the email.
-            response = self.client.send_email(
-                Destination={
-                    'ToAddresses': [
-                        self.RECIPIENT,
-                    ],
-                },
-                Message={
-                    'Body': {
-                        'Html': {
-                            'Charset': self.CHARSET,
-                            'Data': self.BODY_HTML + data['executionData']['desired']['deviceName'] + str(kobitonSessionId),
-                        },
-                        'Text': {
-                            'Charset': self.CHARSET,
-                            'Data': self.BODY_TEXT,
-                        },
-                    },
-                    'Subject': {
-                        'Charset': self.CHARSET,
-                        'Data': self.SUBJECT,
-                    },
-                },
-                Source=self.SENDER,
-                # If you are not using a configuration set, comment or delete the
-                # following line
-                # ConfigurationSetName=CONFIGURATION_SET,
-            )
-        # Display an error if something goes wrong.	
-        except ClientError as e:
-            print(e.response['Error']['Message'])
-        else:
-            print("Email sent! Message ID:"),
-            print(response['MessageId'])
+            # The email body for recipients with non-HTML email clients.
+            BODY_TEXT = ("【KOBITON】the results of Automation Test with Python")
 
-# test = EmailService()  
-# test.send_result_mail()
+            # The HTML body of the email.
+            BODY_HTML = data
+            #  """<html>
+            # <head></head>
+            # <body>
+            # <h1>Amazon SES SMTP Email Test</h1>
+            # <p>This email was sent with Amazon SES using the
+            #     <a href='https://www.python.org/'>Python</a>
+            #     <a href='https://docs.python.org/3/library/smtplib.html'>
+            #     smtplib</a> library.</p>
+            # </body>
+            # </html>
+            #             """
+
+        # Create message container - the correct MIME type is multipart/alternative.
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = SUBJECT
+            msg['From'] = email.utils.formataddr((SENDERNAME, SENDER))
+            msg['To'] = RECIPIENT
+            # Comment or delete the next line if you are not using a configuration set
+            # msg.add_header('X-SES-CONFIGURATION-SET',CONFIGURATION_SET)
+
+            # Record the MIME types of both parts - text/plain and text/html.
+            part1 = MIMEText(BODY_TEXT, 'plain')
+            part2 = MIMEText(BODY_HTML, 'html')
+
+            # Attach parts into message container.
+            # According to RFC 2046, the last part of a multipart message, in this case
+            # the HTML message, is best and preferred.
+            msg.attach(part1)
+            msg.attach(part2)
+
+            # Try to send the message.
+        
+            try:  
+                server = smtplib.SMTP(HOST, PORT)
+                server.ehlo()
+                server.starttls()
+                #stmplib docs recommend calling ehlo() before & after starttls()
+                server.ehlo()
+                server.login(USERNAME_SMTP, PASSWORD_SMTP)
+                server.sendmail(SENDER, RECIPIENT, msg.as_string())
+                server.close()
+            # Display an error message if something goes wrong.
+            except Exception as e:
+                print ("Error: ", e)
+            else:
+                print ("Email sent!")
