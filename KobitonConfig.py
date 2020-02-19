@@ -69,15 +69,17 @@ def SetUpKobiton(self,file_name):
         # For deviceName, platformVersion Kobiton supports wildcard
         # character *, with 3 formats: *text, text* and *text*
         # If there is no *, Kobiton will match the exact text provided
-        'groupId':            944,
+        # 'groupId':            944,
         'deviceName':         deviceName,
         'platformName':       platformName,
         'platformVersion':    platformVersion
     }
     self.driver = webdriver.Remote(KOBITON_SERVER_URL,desired_caps)
     self.driver.implicitly_wait(session_timeout)
+    print(file_name)
     kobitonSessionId = self.driver.desired_capabilities.get('kobitonSessionId')
     print("https://portal.kobiton.com/sessions/%s" % (kobitonSessionId))
+
    
 session_list = []
 
@@ -117,6 +119,7 @@ def fetchTestResult(kobitonSessionIds):
         global count
         global email_text
         global files
+       
         api_key = (USERNAME+ ':' + API_KEYS)
         auth = base64.b64encode(api_key.encode())
         headers = {
@@ -128,7 +131,10 @@ def fetchTestResult(kobitonSessionIds):
         data = response.json()
 
         xml_files = os.listdir(path + "/report")
-        result_lists[count].append(test_files[count])
+        if session_count == 1:
+            result_lists[count].append(data['executionData']['desired']['sessionName'])
+        else:
+            result_lists[count].append(test_files[count])
         result_lists[count].append(data['state'])
         result_lists[count].append(data['executionData']['desired']['deviceName'])
         result_lists[count].append("https://portal.kobiton.com/sessions/"+ str(kobitonSessionId))
@@ -141,7 +147,26 @@ def fetchTestResult(kobitonSessionIds):
                     result_lists[count].append(e)
         count += 1
         print(count)
+        print(session_count)
         if count == session_count:
+            if session_count == 1:
+                if len(result_lists[0]) == 4:
+                    email_text += "<tr bgcolor='79BBFF'><td>" + result_lists[0][0] + "</td>"
+                    email_text += "<td>" + result_lists[0][1] + "</td>"
+                    email_text += "<td>" + result_lists[0][2] + "</td>"
+                    email_text += "<td>" + result_lists[0][3] + "</td>"
+                    email_text += "<td>Passed</td></tr>"
+                else:
+                    email_text += "<tr bgcolor='#F56C6C'><td>" + result_lists[0][0] + "</td>"
+                    email_text += "<td>" + result_lists[0][1] + "</td>"
+                    email_text += "<td>" + result_lists[0][2] + "</td>"
+                    email_text += "<td>" + result_lists[0][3] + "</td>"
+                    email_text += "<td>Failed</td></tr>"
+                    email_text += "<tr><td colspan='5'>Error Description</td></tr>"
+                    email_text += "<tr><td bgcolor='#F56C6C' colspan='5'>" + str(result_lists[0][4]) + "</td></tr>"    
+                email_text += "</table>"
+                EmailService().send_result_mail(email_text,kobitonSessionId)  
+
             for result_list in result_lists:
                 print(result_list[0])
                 if len(result_list) == 4:
@@ -162,7 +187,6 @@ def fetchTestResult(kobitonSessionIds):
             EmailService().send_result_mail(email_text,kobitonSessionId)  
         else:
             print("Test is still in progress...")
-
 
 
 
